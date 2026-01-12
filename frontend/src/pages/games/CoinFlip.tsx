@@ -1,134 +1,165 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Coins } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Coins, RotateCcw } from 'lucide-react';
 import { useGame } from '@/context/GameContext';
+import { BetControls } from '@/components/game/BetControls';
+import { GameStats } from '@/components/game/GameStats';
+import { BetHistory } from '@/components/game/BetHistory';
+import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 
+const MULTIPLIER = 1.98;
+
 export function CoinFlip() {
-    const { balance, placeBet, winBet, loseBet } = useGame();
-    const [betAmount, setBetAmount] = useState(10);
+    const { placeBet, settleBet } = useGame();
     const [choice, setChoice] = useState<'heads' | 'tails'>('heads');
     const [flipping, setFlipping] = useState(false);
     const [result, setResult] = useState<'heads' | 'tails' | null>(null);
-    const [win, setWin] = useState<boolean | null>(null);
+    const [lastWin, setLastWin] = useState<boolean | null>(null);
+    const [flipRotation, setFlipRotation] = useState(0);
 
-    const MULTIPLIER = 1.98;
-
-    const flipCoin = async () => {
-        if (flipping || betAmount <= 0 || betAmount > balance) return;
-        if (!placeBet(betAmount)) return;
+    const handleBet = useCallback(async (amount: number) => {
+        if (flipping || !placeBet(amount)) return;
 
         setFlipping(true);
         setResult(null);
-        setWin(null);
+        setLastWin(null);
 
-        await new Promise(r => setTimeout(r, 1500));
+        // Animate flip
+        setFlipRotation(prev => prev + 1800 + (Math.random() > 0.5 ? 180 : 0));
+
+        await new Promise(r => setTimeout(r, 1200));
 
         const coinResult = Math.random() > 0.5 ? 'heads' : 'tails';
         setResult(coinResult);
 
         const isWin = coinResult === choice;
-        setWin(isWin);
+        setLastWin(isWin);
+        settleBet('coinflip', amount, MULTIPLIER, isWin);
 
         if (isWin) {
-            const winAmount = betAmount * MULTIPLIER;
-            winBet(winAmount);
             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-        } else {
-            loseBet();
         }
 
         setFlipping(false);
-    };
+    }, [flipping, placeBet, settleBet, choice]);
 
     return (
-        <div className="min-h-screen bg-[hsl(var(--background))] text-[hsl(var(--foreground))] p-4">
-            <div className="max-w-lg mx-auto">
-                <Link to="/casino" className="inline-flex items-center gap-2 text-[hsl(var(--muted-foreground))] hover:text-white mb-8 transition-colors">
-                    <ArrowLeft className="w-4 h-4" />
-                    Back to Casino
-                </Link>
-
-                <Card variant="glass">
-                    <CardContent className="p-8">
-                        <div className="flex items-center justify-between mb-8">
-                            <div className="flex items-center gap-3">
-                                <div className="p-3 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 text-white">
-                                    <Coins className="w-8 h-8" />
-                                </div>
-                                <div>
-                                    <h1 className="text-2xl font-bold">Coin Flip</h1>
-                                    <p className="text-sm text-[hsl(var(--muted-foreground))]">1.98x multiplier</p>
-                                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main game area */}
+            <div className="lg:col-span-2 space-y-6">
+                <div className="game-card p-6">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+                                <Coins className="w-6 h-6 text-white" />
                             </div>
-                            <div className="text-right">
-                                <div className="text-xs text-[hsl(var(--muted-foreground))]">Balance</div>
-                                <div className="text-xl font-bold text-[var(--accent)]">${balance.toFixed(2)}</div>
+                            <div>
+                                <h1 className="text-2xl font-bold">Coin Flip</h1>
+                                <p className="text-sm text-[var(--text-muted)]">50/50 odds, 1.98x payout</p>
                             </div>
                         </div>
+                    </div>
 
-                        <div className="h-48 flex items-center justify-center mb-8">
+                    {/* Coin display */}
+                    <div className="bg-[var(--bg-primary)] rounded-2xl p-8 mb-6">
+                        <div className="flex justify-center mb-6" style={{ perspective: '1000px' }}>
                             <motion.div
-                                className={`w-36 h-36 rounded-full relative flex items-center justify-center border-4 border-white/20 shadow-[0_0_50px_rgba(250,204,21,0.3)] ${result === 'heads' ? 'bg-yellow-400' : result === 'tails' ? 'bg-zinc-300' : 'bg-yellow-400'
-                                    }`}
-                                animate={{ rotateY: flipping ? 1800 : 0, scale: flipping ? 1.2 : 1 }}
-                                transition={{ duration: 1.5, ease: "easeInOut" }}
+                                className={cn(
+                                    "w-40 h-40 rounded-full relative flex items-center justify-center shadow-2xl",
+                                    "border-4",
+                                    result === 'heads' ? 'bg-yellow-400 border-yellow-300' :
+                                        result === 'tails' ? 'bg-zinc-400 border-zinc-300' :
+                                            'bg-yellow-400 border-yellow-300'
+                                )}
+                                style={{
+                                    transformStyle: 'preserve-3d',
+                                    boxShadow: '0 0 60px rgba(250, 204, 21, 0.3)'
+                                }}
+                                animate={{
+                                    rotateY: flipRotation,
+                                    scale: flipping ? 1.1 : 1
+                                }}
+                                transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
                             >
-                                <span className="text-4xl font-black text-black/50">
-                                    {flipping ? '?' : (result ? (result === 'heads' ? 'H' : 'T') : '?')}
+                                <span className="text-5xl font-black text-black/40">
+                                    {flipping ? '?' : result ? (result === 'heads' ? 'H' : 'T') : '?'}
                                 </span>
                             </motion.div>
                         </div>
 
-                        {win !== null && (
+                        {/* Result */}
+                        {lastWin !== null && !flipping && (
                             <motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className={`mb-6 text-center text-2xl font-bold ${win ? 'text-green-400' : 'text-red-400'}`}
+                                className={cn(
+                                    "text-center text-2xl font-bold",
+                                    lastWin ? "text-green-400" : "text-red-400"
+                                )}
                             >
-                                {win ? `YOU WON $${(betAmount * MULTIPLIER).toFixed(2)}!` : 'YOU LOST'}
+                                {lastWin ? 'You Win!' : 'You Lose'}
                             </motion.div>
                         )}
+                    </div>
 
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                            <button
-                                onClick={() => setChoice('heads')}
-                                className={`p-4 rounded-xl border transition-all font-bold ${choice === 'heads' ? 'bg-yellow-500/20 border-yellow-500 text-yellow-400' : 'bg-black/20 border-white/10 hover:bg-white/5'
-                                    }`}
-                            >
-                                HEADS
-                            </button>
-                            <button
-                                onClick={() => setChoice('tails')}
-                                className={`p-4 rounded-xl border transition-all font-bold ${choice === 'tails' ? 'bg-zinc-400/20 border-zinc-400 text-zinc-300' : 'bg-black/20 border-white/10 hover:bg-white/5'
-                                    }`}
-                            >
-                                TAILS
-                            </button>
-                        </div>
+                    {/* Choice selection */}
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                        <button
+                            onClick={() => setChoice('heads')}
+                            disabled={flipping}
+                            className={cn(
+                                "py-6 rounded-xl font-bold text-lg transition-all border-2",
+                                choice === 'heads'
+                                    ? "bg-yellow-500/20 border-yellow-500 text-yellow-400"
+                                    : "bg-[var(--bg-elevated)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border-hover)]"
+                            )}
+                        >
+                            <div className="text-3xl mb-1">🪙</div>
+                            HEADS
+                        </button>
+                        <button
+                            onClick={() => setChoice('tails')}
+                            disabled={flipping}
+                            className={cn(
+                                "py-6 rounded-xl font-bold text-lg transition-all border-2",
+                                choice === 'tails'
+                                    ? "bg-zinc-400/20 border-zinc-400 text-zinc-300"
+                                    : "bg-[var(--bg-elevated)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border-hover)]"
+                            )}
+                        >
+                            <div className="text-3xl mb-1">⚫</div>
+                            TAILS
+                        </button>
+                    </div>
 
-                        <div className="flex gap-4">
-                            <input
-                                type="number"
-                                value={betAmount}
-                                onChange={(e) => setBetAmount(Math.max(0, Number(e.target.value)))}
-                                className="flex-1 bg-black/20 border border-white/10 rounded-xl px-4 py-3 font-mono text-lg focus:outline-none focus:border-[var(--accent)]/50"
-                                placeholder="Bet Amount"
-                            />
-                            <Button
-                                onClick={flipCoin}
-                                disabled={flipping || balance < betAmount || betAmount <= 0}
-                                className="flex-[2]"
-                                size="lg"
-                            >
-                                {flipping ? 'FLIPPING...' : 'FLIP COIN'}
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
+                    {/* Stats */}
+                    <GameStats
+                        winChance={50}
+                        multiplier={MULTIPLIER}
+                        className="mb-6"
+                    />
+
+                    {/* Bet controls */}
+                    <BetControls
+                        onBet={handleBet}
+                        disabled={flipping}
+                        loading={flipping}
+                        buttonText="Flip Coin"
+                    />
+                </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+                <div className="game-card p-4">
+                    <h3 className="font-bold mb-4 flex items-center gap-2">
+                        <RotateCcw className="w-4 h-4" />
+                        Recent Bets
+                    </h3>
+                    <BetHistory />
+                </div>
             </div>
         </div>
     );

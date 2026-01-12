@@ -1,65 +1,178 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 
 const INITIAL_BALANCE = 1000;
+const STORAGE_KEY = 'solstice-casino-state';
 
-interface GameContextType {
+export interface Bet {
+    id: string;
+    game: string;
+    amount: number;
+    multiplier: number;
+    payout: number;
+    win: boolean;
+    timestamp: number;
+}
+
+interface GameState {
+    // User
+    username: string;
+    level: number;
+    xp: number;
+
+    // Balance
     balance: number;
     isVerified: boolean;
+
+    // Stats
     totalWins: number;
     totalLosses: number;
+    totalWagered: number;
+    profit: number;
+
+    // History
+    bets: Bet[];
+}
+
+interface GameContextType extends GameState {
     setVerified: (verified: boolean) => void;
     placeBet: (amount: number) => boolean;
-    winBet: (payout: number) => void;
-    loseBet: () => void;
+    settleBet: (game: string, amount: number, multiplier: number, win: boolean) => void;
     resetBalance: () => void;
+    addFunds: (amount: number) => void;
+    setUsername: (name: string) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
+function calculateLevel(wagered: number): { level: number; xp: number } {
+    // Level up every $500 wagered
+    const level = Math.floor(wagered / 500) + 1;
+    const xp = Math.floor((wagered % 500) / 5);
+    return { level, xp };
+}
+
+function loadState(): GameState {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            const { level, xp } = calculateLevel(parsed.totalWagered ?? 0);
+            return {
+                username: parsed.username ?? 'Player',
+                level,
+                xp,
+                balance: parsed.balance ?? INITIAL_BALANCE,
+                isVerified: parsed.isVerified ?? false,
+                totalWins: parsed.totalWins ?? 0,
+                totalLosses: parsed.totalLosses ?? 0,
+                totalWagered: parsed.totalWagered ?? 0,
+                profit: parsed.profit ?? 0,
+                bets: parsed.bets ?? [],
+            };
+        }
+    } catch (e) {
+        console.error('Failed to load state:', e);
+    }
+    return {
+        username: 'Player',
+        level: 1,
+        xp: 0,
+        balance: INITIAL_BALANCE,
+        isVerified: false,
+        totalWins: 0,
+        totalLosses: 0,
+        totalWagered: 0,
+        profit: 0,
+        bets: [],
+    };
+}
+
 export function GameProvider({ children }: { children: ReactNode }) {
-    const [balance, setBalance] = useState(INITIAL_BALANCE);
-    const [isVerified, setIsVerified] = useState(false);
-    const [totalWins, setTotalWins] = useState(0);
-    const [totalLosses, setTotalLosses] = useState(0);
+    const [state, setState] = useState<GameState>(loadState);
+
+    // Persist state to localStorage
+    useEffect(() => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }, [state]);
 
     const setVerified = useCallback((verified: boolean) => {
-        setIsVerified(verified);
+        setState(prev => ({ ...prev, isVerified: verified }));
+    }, []);
+
+    const setUsername = useCallback((name: string) => {
+        setState(prev => ({ ...prev, username: name }));
     }, []);
 
     const placeBet = useCallback((amount: number): boolean => {
-        if (amount <= 0 || amount > balance) {
+        if (amount <= 0 || amount > state.balance) {
             return false;
         }
-        setBalance(prev => prev - amount);
+        setState(prev => {
+            const newWagered = prev.totalWagered + amount;
+            const { level, xp } = calculateLevel(newWagered);
+            return {
+                ...prev,
+                balance: prev.balance - amount,
+                totalWagered: newWagered,
+                level,
+                xp,
+            };
+        });
         return true;
-    }, [balance]);
+    }, [state.balance]);
 
-    const winBet = useCallback((payout: number) => {
-        setBalance(prev => prev + payout);
-        setTotalWins(prev => prev + 1);
-    }, []);
+    const settleBet = useCallback((game: string, amount: number, multiplier: number, win: boolean) => {
+        const payout = win ? amount * multiplier : 0;
+        const profitDelta = win ? payout - amount : -amount;
 
-    const loseBet = useCallback(() => {
-        setTotalLosses(prev => prev + 1);
+        const bet: Bet = {
+            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            game,
+            amount,
+            multiplier: win ? multiplier : 0,
+            payout,
+            win,
+            timestamp: Date.now(),
+        };
+
+        setState(prev => ({
+            ...prev,
+            balance: prev.balance + payout,
+            totalWins: win ? prev.totalWins + 1 : prev.totalWins,
+            totalLosses: win ? prev.totalLosses : prev.totalLosses + 1,
+            profit: prev.profit + profitDelta,
+            bets: [bet, ...prev.bets.slice(0, 99)],
+        }));
     }, []);
 
     const resetBalance = useCallback(() => {
-        setBalance(INITIAL_BALANCE);
-        setTotalWins(0);
-        setTotalLosses(0);
+        setState({
+            username: state.username,
+            level: 1,
+            xp: 0,
+            balance: INITIAL_BALANCE,
+            isVerified: state.isVerified,
+            totalWins: 0,
+            totalLosses: 0,
+            totalWagered: 0,
+            profit: 0,
+            bets: [],
+        });
+    }, [state.isVerified, state.username]);
+
+    const addFunds = useCallback((amount: number) => {
+        setState(prev => ({ ...prev, balance: prev.balance + amount }));
     }, []);
 
     return (
         <GameContext.Provider value={{
-            balance,
-            isVerified,
-            totalWins,
-            totalLosses,
+            ...state,
             setVerified,
+            setUsername,
             placeBet,
-            winBet,
-            loseBet,
+            settleBet,
             resetBalance,
+            addFunds,
         }}>
             {children}
         </GameContext.Provider>

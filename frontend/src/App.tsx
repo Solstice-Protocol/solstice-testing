@@ -2,22 +2,25 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { SolsticeSDK } from '@solsticeprotocol/sdk';
 import { PublicKey } from '@solana/web3.js';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Shield, QrCode, Loader2, Lock } from 'lucide-react';
+import { Shield, QrCode, Loader2 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { GameProvider, useGame } from '@/context/GameContext';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { CasinoHome } from '@/pages/CasinoHome';
 import { Dice } from '@/pages/games/Dice';
 import { CoinFlip } from '@/pages/games/CoinFlip';
 import { Mines } from '@/pages/games/Mines';
 import { Roulette } from '@/pages/games/Roulette';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
+import { Plinko } from '@/pages/games/Plinko';
+import { Limbo } from '@/pages/games/Limbo';
+import { Slots } from '@/pages/games/Slots';
+import { Profile } from '@/pages/Profile';
+import { Promotions } from '@/pages/Promotions';
+import { Settings } from '@/pages/Settings';
 import './App.css';
 
 const APP_CONFIG = {
-  appId: 'solstice-vault-demo',
+  appId: 'solstice-casino',
   appName: 'Solstice Casino',
   backendUrl: 'http://localhost:3000/api',
 };
@@ -27,7 +30,6 @@ function AgeVerification() {
   const { setVerified } = useGame();
   const navigate = useNavigate();
   const [sdk, setSdk] = useState<SolsticeSDK | null>(null);
-  const [challenge, setChallenge] = useState<any>(null);
   const [challengeQR, setChallengeQR] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -85,16 +87,6 @@ function AgeVerification() {
         { expirationSeconds: 300, callbackUrl: `${APP_CONFIG.backendUrl}/challenges/${backendChallengeId}/respond` }
       );
 
-      const fullChallenge = {
-        challengeId: backendChallengeId,
-        appId: APP_CONFIG.appId,
-        appName: APP_CONFIG.appName,
-        proofType: 'age',
-        params: { threshold: 18 },
-        ...(result.challenge || {})
-      };
-
-      setChallenge(fullChallenge);
       setChallengeQR(result.qrDataEncoded);
       pollForProof(backendChallengeId);
     } catch (err: any) {
@@ -110,9 +102,7 @@ function AgeVerification() {
       try {
         const response = await fetch(`${APP_CONFIG.backendUrl}/challenges/${challengeId}/status`);
 
-        if (!response.ok) {
-          throw new Error(`Status check failed: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Status check failed: ${response.status}`);
 
         const data = await response.json();
 
@@ -122,9 +112,7 @@ function AgeVerification() {
             headers: { 'Content-Type': 'application/json' }
           });
 
-          if (!verifyResponse.ok) {
-            throw new Error(`Verification failed: ${verifyResponse.status}`);
-          }
+          if (!verifyResponse.ok) throw new Error(`Verification failed: ${verifyResponse.status}`);
 
           const verifyData = await verifyResponse.json();
 
@@ -150,152 +138,116 @@ function AgeVerification() {
     poll();
   };
 
-  // Demo mode: Skip verification
   const skipVerification = () => {
     setVerified(true);
     navigate('/casino');
   };
 
   const reset = () => {
-    setChallenge(null);
     setChallengeQR(null);
     setError(null);
   };
 
   if (!sdk) {
     return (
-      <div className="min-h-screen bg-[hsl(var(--background))] flex items-center justify-center">
-        <Card variant="glass" className="w-96">
-          <CardContent className="pt-6 text-center">
-            <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-[var(--accent)]" />
-            <p className="text-[hsl(var(--muted-foreground))]">Initializing Solstice SDK...</p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-darkest)]">
+        <div className="age-verify-card text-center">
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-[var(--accent)]" />
+          <p className="text-[var(--text-muted)]">Initializing...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--accent)]/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[var(--accent)]/5 rounded-full blur-3xl animate-pulse" />
-      </div>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--bg-darkest)]">
+      <div className="w-full max-w-md">
+        {!challengeQR ? (
+          <div className="age-verify-card">
+            <div className="text-center mb-8">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-emerald-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[var(--accent-glow)]">
+                <Shield className="w-10 h-10 text-black" />
+              </div>
+              <h1 className="text-3xl font-bold mb-2">Solstice Casino</h1>
+              <p className="text-[var(--text-muted)]">Age verification required (18+)</p>
+            </div>
 
-      <div className="relative z-10 container mx-auto px-4 py-8">
-        <header className="text-center mb-12" data-aos="fade-down">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Shield className="w-10 h-10 text-[var(--accent)]" />
-            <span className="text-3xl font-bold gradient">Solstice Casino</span>
+            {error && (
+              <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm mb-6">
+                {error}
+              </div>
+            )}
+
+            <div className="bg-[var(--bg-primary)] rounded-xl p-5 mb-6">
+              <h3 className="font-semibold mb-3">How it works</h3>
+              <ol className="space-y-3 text-sm text-[var(--text-muted)]">
+                <li className="flex gap-3">
+                  <span className="w-6 h-6 rounded-full bg-[var(--accent)] text-black text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
+                  Generate a verification QR code
+                </li>
+                <li className="flex gap-3">
+                  <span className="w-6 h-6 rounded-full bg-[var(--accent)] text-black text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
+                  Scan with Solstice app
+                </li>
+                <li className="flex gap-3">
+                  <span className="w-6 h-6 rounded-full bg-[var(--accent)] text-black text-xs font-bold flex items-center justify-center flex-shrink-0">3</span>
+                  Zero-knowledge proof verifies you're 18+
+                </li>
+              </ol>
+            </div>
+
+            <button onClick={generateChallenge} className="bet-button mb-4 flex items-center justify-center gap-2">
+              <QrCode className="w-5 h-5" />
+              Generate QR Code
+            </button>
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-[var(--border)]" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-[var(--bg-card)] px-3 text-[var(--text-muted)]">or</span>
+              </div>
+            </div>
+
+            <button
+              onClick={skipVerification}
+              className="w-full py-3 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-colors font-medium"
+            >
+              Skip (Demo Mode)
+            </button>
           </div>
-          <p className="text-[hsl(var(--muted-foreground))]">
-            Age-restricted content • Powered by <span className="text-[var(--accent)]">Solstice Protocol</span>
-          </p>
-        </header>
+        ) : (
+          <div className="age-verify-card">
+            <div className="text-center mb-6">
+              <QrCode className="w-12 h-12 text-[var(--accent)] mx-auto mb-2" />
+              <h2 className="text-2xl font-bold">Scan QR Code</h2>
+              <p className="text-sm text-[var(--text-muted)]">Open Solstice app and scan</p>
+            </div>
 
-        <div className="max-w-2xl mx-auto">
-          {!challengeQR ? (
-            <Card variant="glass" data-aos="fade-up">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lock className="w-6 h-6 text-[var(--accent)]" />
-                  Age Verification Required (18+)
-                </CardTitle>
-                <CardDescription>
-                  You must verify your age using zero-knowledge proof to access the casino
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {error && (
-                  <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
-                    {error}
-                  </div>
-                )}
+            <div className="bg-white p-6 rounded-2xl mb-6">
+              <QRCodeSVG value={challengeQR} size={256} className="w-full h-auto" />
+            </div>
 
-                <div className="bg-[hsl(var(--muted))]/50 border border-[hsl(var(--border))] rounded-lg p-6 space-y-3">
-                  <h3 className="font-semibold text-lg">How it works:</h3>
-                  <ol className="space-y-2 text-sm text-[hsl(var(--muted-foreground))]">
-                    <li className="flex gap-3">
-                      <span className="font-bold text-[var(--accent)] min-w-[24px]">1.</span>
-                      <span>We generate a verification challenge QR code</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="font-bold text-[var(--accent)] min-w-[24px]">2.</span>
-                      <span>You scan it with the Solstice app</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="font-bold text-[var(--accent)] min-w-[24px]">3.</span>
-                      <span>The app generates a zero-knowledge proof that you're 18+</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="font-bold text-[var(--accent)] min-w-[24px]">4.</span>
-                      <span>We verify the proof and grant you access (no data shared!)</span>
-                    </li>
-                  </ol>
-                </div>
+            <div className="flex items-center justify-center gap-2 text-[var(--accent)] mb-4">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="text-sm">Waiting for verification...</span>
+            </div>
 
-                <Button onClick={generateChallenge} className="w-full" size="lg">
-                  <QrCode className="w-5 h-5 mr-2" />
-                  Generate Verification QR Code
-                </Button>
+            {error && (
+              <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm mb-4">
+                {error}
+              </div>
+            )}
 
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-[hsl(var(--border))]" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-[hsl(var(--background))] px-2 text-[hsl(var(--muted-foreground))]">
-                      Or for demo
-                    </span>
-                  </div>
-                </div>
-
-                <Button onClick={skipVerification} variant="outline" className="w-full">
-                  Skip Verification (Demo Mode)
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card variant="glass" data-aos="fade-up">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <QrCode className="w-6 h-6 text-[var(--accent)]" />
-                  Scan This QR Code
-                </CardTitle>
-                <CardDescription>
-                  Open the Solstice app and scan this challenge
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="bg-white p-6 rounded-lg mx-auto w-fit shadow-lg glow-accent">
-                  <QRCodeSVG value={challengeQR} size={256} />
-                </div>
-
-                <div className="text-center space-y-2">
-                  <div className="flex items-center justify-center gap-2 text-[var(--accent)]">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span className="font-semibold">Waiting for proof submission...</span>
-                  </div>
-                  {challenge?.challengeId && (
-                    <p className="text-sm text-[hsl(var(--muted-foreground))]">
-                      Challenge ID: <span className="font-mono">{challenge.challengeId.substring(0, 16)}...</span>
-                    </p>
-                  )}
-                </div>
-
-                {error && (
-                  <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
-                    {error}
-                  </div>
-                )}
-
-                <Button onClick={reset} variant="outline" className="w-full">
-                  Cancel
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+            <button
+              onClick={reset}
+              className="w-full py-3 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-colors font-medium"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -312,42 +264,57 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// Layout wrapper for casino routes
+function CasinoLayout() {
+  return (
+    <ProtectedRoute>
+      <MainLayout />
+    </ProtectedRoute>
+  );
+}
+
+// VIP placeholder
+function VIP() {
+  return (
+    <div className="max-w-2xl mx-auto text-center py-20">
+      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mx-auto mb-6 shadow-xl">
+        <span className="text-4xl">👑</span>
+      </div>
+      <h1 className="text-3xl font-bold mb-4">VIP Club</h1>
+      <p className="text-[var(--text-muted)] mb-8">
+        Coming soon! Exclusive rewards for our most valued players.
+      </p>
+      <div className="inline-block px-6 py-3 bg-[var(--bg-card)] rounded-xl text-[var(--text-muted)]">
+        Contact support to apply for VIP status
+      </div>
+    </div>
+  );
+}
+
 // Main App Routes
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<AgeVerification />} />
-      <Route path="/casino" element={
-        <ProtectedRoute><CasinoHome /></ProtectedRoute>
-      } />
-      <Route path="/casino/dice" element={
-        <ProtectedRoute><Dice /></ProtectedRoute>
-      } />
-      <Route path="/casino/coinflip" element={
-        <ProtectedRoute><CoinFlip /></ProtectedRoute>
-      } />
-      <Route path="/casino/mines" element={
-        <ProtectedRoute><Mines /></ProtectedRoute>
-      } />
-      <Route path="/casino/roulette" element={
-        <ProtectedRoute><Roulette /></ProtectedRoute>
-      } />
+      <Route element={<CasinoLayout />}>
+        <Route path="/casino" element={<CasinoHome />} />
+        <Route path="/casino/dice" element={<Dice />} />
+        <Route path="/casino/coinflip" element={<CoinFlip />} />
+        <Route path="/casino/mines" element={<Mines />} />
+        <Route path="/casino/roulette" element={<Roulette />} />
+        <Route path="/casino/plinko" element={<Plinko />} />
+        <Route path="/casino/limbo" element={<Limbo />} />
+        <Route path="/casino/slots" element={<Slots />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/promotions" element={<Promotions />} />
+        <Route path="/vip" element={<VIP />} />
+        <Route path="/settings" element={<Settings />} />
+      </Route>
     </Routes>
   );
 }
 
 function App() {
-  useEffect(() => {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    AOS.init({
-      once: true,
-      duration: 600,
-      offset: 40,
-      mirror: false,
-      disable: prefersReducedMotion || window.innerWidth < 768,
-    });
-  }, []);
-
   return (
     <BrowserRouter>
       <GameProvider>

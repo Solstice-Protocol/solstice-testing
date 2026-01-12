@@ -1,98 +1,207 @@
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Dices, Coins, Bomb, Target, Shield, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { motion } from 'framer-motion';
+import {
+    Dices, Coins, Bomb, Target, Zap, TrendingUp,
+    Sparkles, Trophy, Clock, Users, ArrowRight
+} from 'lucide-react';
 import { useGame } from '@/context/GameContext';
 
 const games = [
-    { id: 'dice', name: 'Dice', icon: Dices, color: 'from-blue-500 to-indigo-600', desc: 'Roll over or under your target number', multiplier: 'Up to 99x' },
-    { id: 'coinflip', name: 'Coin Flip', icon: Coins, color: 'from-yellow-400 to-orange-500', desc: 'Double or nothing - pick heads or tails', multiplier: '1.98x' },
-    { id: 'mines', name: 'Mines', icon: Bomb, color: 'from-red-500 to-rose-600', desc: 'Uncover gems, avoid the mines', multiplier: 'Up to 24x' },
-    { id: 'roulette', name: 'Roulette', icon: Target, color: 'from-green-500 to-emerald-600', desc: 'Spin the wheel and test your luck', multiplier: 'Up to 36x' },
+    { id: 'dice', name: 'Dice', icon: Dices, gradient: 'from-blue-500 to-indigo-600', desc: 'Roll over or under', edge: '1%' },
+    { id: 'coinflip', name: 'Coin Flip', icon: Coins, gradient: 'from-amber-400 to-orange-500', desc: '50/50 odds', edge: '1%' },
+    { id: 'mines', name: 'Mines', icon: Bomb, gradient: 'from-red-500 to-rose-600', desc: 'Find the gems', edge: '3%' },
+    { id: 'roulette', name: 'Roulette', icon: Target, gradient: 'from-emerald-500 to-green-600', desc: 'Spin to win', edge: '2.7%' },
+    { id: 'plinko', name: 'Plinko', icon: Zap, gradient: 'from-pink-500 to-rose-500', desc: 'Drop the ball', edge: '3%' },
+    { id: 'limbo', name: 'Limbo', icon: TrendingUp, gradient: 'from-purple-500 to-violet-600', desc: 'Beat the target', edge: '2%' },
+    { id: 'slots', name: 'Slots', icon: Dices, gradient: 'from-yellow-400 to-amber-500', desc: 'Spin to match', edge: '4%' },
+];
+
+// Mock live feed
+const mockLiveFeed = [
+    { user: 'Player1', game: 'dice', amount: 50, multiplier: 2.5, win: true },
+    { user: 'GamerX', game: 'slots', amount: 100, multiplier: 10, win: true },
+    { user: 'Lucky7', game: 'mines', amount: 25, multiplier: 0, win: false },
+    { user: 'HighRoller', game: 'limbo', amount: 200, multiplier: 3.2, win: true },
+    { user: 'CryptoKing', game: 'coinflip', amount: 75, multiplier: 0, win: false },
 ];
 
 export function CasinoHome() {
-    const { balance, resetBalance, totalWins, totalLosses } = useGame();
+    const { balance, level, totalWins, totalLosses, profit, bets } = useGame();
 
     return (
-        <div className="min-h-screen bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
-            <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--accent)]/10 rounded-full blur-3xl animate-pulse" />
-                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[var(--accent)]/5 rounded-full blur-3xl animate-pulse" />
-            </div>
-
-            <div className="relative z-10 container mx-auto px-4 py-8 max-w-6xl">
-                <header className="mb-12">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[hsl(var(--border))] pb-6">
-                        <div className="flex items-center gap-3">
-                            <Shield className="w-10 h-10 text-[var(--accent)]" />
-                            <div>
-                                <h1 className="text-3xl font-bold gradient">Solstice Casino</h1>
-                                <p className="text-sm text-[hsl(var(--muted-foreground))]">Powered by Zero-Knowledge Proofs</p>
-                            </div>
+        <div className="space-y-8">
+            {/* Hero Banner */}
+            <div className="home-hero relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent)]/10 to-transparent" />
+                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div>
+                        <div className="flex items-center gap-2 mb-3">
+                            <Sparkles className="w-5 h-5 text-[var(--accent)]" />
+                            <span className="text-sm font-medium text-[var(--accent)]">Welcome to Solstice Casino</span>
                         </div>
-
-                        <div className="flex items-center gap-4">
-                            <div className="bg-[hsl(var(--muted))]/50 border border-[hsl(var(--border))] rounded-lg px-4 py-2">
-                                <div className="text-xs text-[hsl(var(--muted-foreground))]">Balance</div>
-                                <div className="text-xl font-bold text-[var(--accent)]">${balance.toFixed(2)}</div>
-                            </div>
-                            <div className="bg-[hsl(var(--muted))]/50 border border-[hsl(var(--border))] rounded-lg px-4 py-2">
-                                <div className="text-xs text-[hsl(var(--muted-foreground))]">W/L</div>
-                                <div className="text-sm font-mono">
-                                    <span className="text-green-400">{totalWins}</span>/<span className="text-red-400">{totalLosses}</span>
-                                </div>
-                            </div>
-                            <Button variant="outline" size="sm" onClick={resetBalance}>
-                                <RefreshCw className="w-4 h-4 mr-1" />Reset
-                            </Button>
+                        <h1 className="text-4xl font-bold mb-2">
+                            Play to <span className="gradient-text">Win Big</span>
+                        </h1>
+                        <p className="text-[var(--text-muted)] max-w-md">
+                            Experience provably fair gaming with instant payouts. Your next big win is just one bet away.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-6">
+                        <div className="text-center">
+                            <div className="text-3xl font-bold text-[var(--accent)]">${balance.toFixed(2)}</div>
+                            <div className="text-sm text-[var(--text-muted)]">Balance</div>
+                        </div>
+                        <div className="h-12 w-px bg-[var(--border)]" />
+                        <div className="text-center">
+                            <div className="text-3xl font-bold">Lvl {level}</div>
+                            <div className="text-sm text-[var(--text-muted)]">Your Level</div>
                         </div>
                     </div>
-                </header>
+                </div>
+            </div>
 
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-                    <h2 className="text-4xl md:text-6xl font-black mb-4 tracking-tighter">
-                        <span className="gradient">CASINO LOUNGE</span>
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="game-card p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                        <Trophy className="w-5 h-5 text-green-400" />
+                    </div>
+                    <div>
+                        <div className="text-2xl font-bold text-green-400">{totalWins}</div>
+                        <div className="text-xs text-[var(--text-muted)]">Total Wins</div>
+                    </div>
+                </div>
+                <div className="game-card p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
+                        <TrendingUp className="w-5 h-5 text-red-400" />
+                    </div>
+                    <div>
+                        <div className="text-2xl font-bold text-red-400">{totalLosses}</div>
+                        <div className="text-xs text-[var(--text-muted)]">Total Losses</div>
+                    </div>
+                </div>
+                <div className="game-card p-4 flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-lg ${profit >= 0 ? 'bg-green-500/20' : 'bg-red-500/20'} flex items-center justify-center`}>
+                        <TrendingUp className={`w-5 h-5 ${profit >= 0 ? 'text-green-400' : 'text-red-400'}`} />
+                    </div>
+                    <div>
+                        <div className={`text-2xl font-bold ${profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            {profit >= 0 ? '+' : ''}${profit.toFixed(0)}
+                        </div>
+                        <div className="text-xs text-[var(--text-muted)]">Profit</div>
+                    </div>
+                </div>
+                <div className="game-card p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                        <Clock className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <div>
+                        <div className="text-2xl font-bold">{bets.length}</div>
+                        <div className="text-xs text-[var(--text-muted)]">Total Bets</div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Games Grid */}
+            <div>
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold flex items-center gap-2">
+                        <Dices className="w-5 h-5 text-[var(--accent)]" />
+                        Casino Games
                     </h2>
-                    <p className="text-[hsl(var(--muted-foreground))] max-w-md mx-auto">
-                        Choose your game and test your luck. All games are provably fair.
-                    </p>
-                </motion.div>
+                    <span className="text-sm text-[var(--text-muted)]">{games.length} games available</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {games.map((game, i) => {
+                        const Icon = game.icon;
+                        return (
+                            <motion.div
+                                key={game.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: i * 0.05 }}
+                            >
+                                <Link to={`/casino/${game.id}`}>
+                                    <div className="game-grid-card group">
+                                        <div className={`w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-br ${game.gradient} shadow-lg mb-4`}>
+                                            <Icon className="w-7 h-7 text-white" />
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h3 className="font-bold text-lg group-hover:text-[var(--accent)] transition-colors">
+                                                    {game.name}
+                                                </h3>
+                                                <p className="text-sm text-[var(--text-muted)]">{game.desc}</p>
+                                            </div>
+                                            <ArrowRight className="w-5 h-5 text-[var(--text-muted)] group-hover:text-[var(--accent)] group-hover:translate-x-1 transition-all" />
+                                        </div>
+                                    </div>
+                                </Link>
+                            </motion.div>
+                        );
+                    })}
+                </div>
+            </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {games.map((game, i) => (
-                        <motion.div key={game.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.1 }}>
-                            <Link to={`/casino/${game.id}`}>
-                                <Card variant="glass" className="group cursor-pointer hover:border-[var(--accent)]/50 transition-all duration-300 overflow-hidden">
-                                    <CardContent className="p-6 relative">
-                                        <div className={`absolute inset-0 bg-gradient-to-br ${game.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
-                                        <div className="relative flex items-start gap-4">
-                                            <div className={`p-4 rounded-xl bg-gradient-to-br ${game.color} text-white shadow-lg`}>
-                                                <game.icon className="w-8 h-8" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <h3 className="text-2xl font-bold">{game.name}</h3>
-                                                    <span className="text-xs font-mono bg-[hsl(var(--muted))] px-2 py-1 rounded text-[var(--accent)]">{game.multiplier}</span>
-                                                </div>
-                                                <p className="text-[hsl(var(--muted-foreground))] text-sm">{game.desc}</p>
-                                            </div>
-                                        </div>
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all">
-                                            <span className="text-[var(--accent)] text-2xl">→</span>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </Link>
-                        </motion.div>
-                    ))}
+            {/* Live Feed */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="game-card p-5">
+                    <h3 className="font-bold mb-4 flex items-center gap-2">
+                        <Users className="w-5 h-5 text-[var(--accent)]" />
+                        Live Bets
+                    </h3>
+                    <div className="space-y-2">
+                        {mockLiveFeed.map((bet, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: i * 0.1 }}
+                                className={`live-feed-item ${bet.win ? 'win' : 'loss'}`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-[var(--bg-elevated)] flex items-center justify-center text-sm font-bold">
+                                        {bet.user.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <div className="font-medium">{bet.user}</div>
+                                        <div className="text-xs text-[var(--text-muted)] capitalize">{bet.game}</div>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <div className={`font-bold ${bet.win ? 'text-green-400' : 'text-red-400'}`}>
+                                        {bet.win ? '+' : '-'}${bet.win ? (bet.amount * bet.multiplier).toFixed(2) : bet.amount.toFixed(2)}
+                                    </div>
+                                    <div className="text-xs text-[var(--text-muted)]">
+                                        {bet.win ? `${bet.multiplier}x` : 'Lost'}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
                 </div>
 
-                <footer className="mt-12 text-center text-sm text-[hsl(var(--muted-foreground))]">
-                    <p>Age verified via <span className="text-[var(--accent)]">Solstice Protocol</span></p>
-                    <p className="mt-1">Demo tokens only • Not real money</p>
-                </footer>
+                {/* Promotions Preview */}
+                <div className="game-card p-5">
+                    <h3 className="font-bold mb-4 flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-[var(--accent)]" />
+                        Featured Promotions
+                    </h3>
+                    <div className="space-y-3">
+                        <Link to="/promotions" className="block p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl hover:from-purple-500/30 hover:to-pink-500/30 transition-colors">
+                            <div className="font-bold mb-1">🎉 Daily Bonus</div>
+                            <div className="text-sm text-[var(--text-muted)]">Claim $100 free credits every day!</div>
+                        </Link>
+                        <Link to="/vip" className="block p-4 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-xl hover:from-amber-500/30 hover:to-orange-500/30 transition-colors">
+                            <div className="font-bold mb-1">👑 VIP Club</div>
+                            <div className="text-sm text-[var(--text-muted)]">Exclusive rewards for high rollers</div>
+                        </Link>
+                        <Link to="/promotions" className="block p-4 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl hover:from-blue-500/30 hover:to-cyan-500/30 transition-colors">
+                            <div className="font-bold mb-1">🎰 Slots Tournament</div>
+                            <div className="text-sm text-[var(--text-muted)]">Compete for the weekly jackpot!</div>
+                        </Link>
+                    </div>
+                </div>
             </div>
         </div>
     );
