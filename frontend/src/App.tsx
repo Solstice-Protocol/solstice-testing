@@ -1,48 +1,35 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { SolsticeSDK } from '@solsticeprotocol/sdk';
 import { PublicKey } from '@solana/web3.js';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Shield, QrCode, CheckCircle2, Loader2, Lock, Trophy, RefreshCw } from 'lucide-react';
+import { Shield, QrCode, Loader2, Lock } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { GameProvider, useGame } from '@/context/GameContext';
+import { CasinoHome } from '@/pages/CasinoHome';
+import { Dice } from '@/pages/games/Dice';
+import { CoinFlip } from '@/pages/games/CoinFlip';
+import { Mines } from '@/pages/games/Mines';
+import { Roulette } from '@/pages/games/Roulette';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import './App.css';
 
-const RESTRICTED_CONTENT = {
-  game: {
-    title: 'Elite Crypto Casino',
-    description: 'High-stakes NFT gaming with 1000 SOL prize pool',
-  },
-};
-
 const APP_CONFIG = {
   appId: 'solstice-vault-demo',
-  appName: 'Solstice Vault',
+  appName: 'Solstice Casino',
   backendUrl: 'http://localhost:3000/api',
 };
 
-function App() {
+// Age Verification Component
+function AgeVerification() {
+  const { setVerified } = useGame();
+  const navigate = useNavigate();
   const [sdk, setSdk] = useState<SolsticeSDK | null>(null);
   const [challenge, setChallenge] = useState<any>(null);
   const [challengeQR, setChallengeQR] = useState<string | null>(null);
-  const [isVerified, setIsVerified] = useState(false);
-  const [, setIsWaiting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Initialize AOS animations
-  useEffect(() => {
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-    AOS.init({
-      once: true,
-      duration: 600,
-      offset: 40,
-      mirror: false,
-      disable: prefersReducedMotion || window.innerWidth < 768,
-    });
-  }, []);
 
   useEffect(() => {
     const initSDK = async () => {
@@ -54,7 +41,6 @@ function App() {
         });
         await solsticeSDK.initialize();
         setSdk(solsticeSDK);
-        console.log('✅ Solstice SDK initialized');
       } catch (err) {
         console.error('SDK init error:', err);
         setError('Failed to initialize SDK');
@@ -67,7 +53,6 @@ function App() {
     if (!sdk) return;
     try {
       setError(null);
-      setIsWaiting(true);
 
       const createResponse = await fetch(`${APP_CONFIG.backendUrl}/challenges/create`, {
         method: 'POST',
@@ -86,15 +71,11 @@ function App() {
       }
 
       const challengeData = await createResponse.json();
-      console.log('📦 Backend response:', challengeData);
-
       const backendChallengeId = challengeData.challengeId || challengeData.challenge?.challengeId;
 
       if (!backendChallengeId) {
         throw new Error('No challengeId received from backend');
       }
-
-      console.log('✅ Challenge created on backend:', backendChallengeId);
 
       const result = await sdk.generateChallenge(
         APP_CONFIG.appId,
@@ -115,24 +96,18 @@ function App() {
 
       setChallenge(fullChallenge);
       setChallengeQR(result.qrDataEncoded);
-      console.log('✅ Challenge QR generated:', fullChallenge.challengeId);
-
       pollForProof(backendChallengeId);
     } catch (err: any) {
       setError(`Failed: ${err.message}`);
-      setIsWaiting(false);
-      console.error('Challenge generation error:', err);
     }
   };
 
   const pollForProof = async (challengeId: string) => {
-    console.log('🔄 Starting to poll for challenge:', challengeId);
     const maxAttempts = 60;
     let attempts = 0;
 
     const poll = async () => {
       try {
-        console.log(`📡 Polling attempt ${attempts + 1}/${maxAttempts} for challenge: ${challengeId}`);
         const response = await fetch(`${APP_CONFIG.backendUrl}/challenges/${challengeId}/status`);
 
         if (!response.ok) {
@@ -140,7 +115,6 @@ function App() {
         }
 
         const data = await response.json();
-        console.log('📊 Challenge status:', data.status);
 
         if (data.status === 'completed') {
           const verifyResponse = await fetch(`${APP_CONFIG.backendUrl}/challenges/${challengeId}/verify`, {
@@ -155,37 +129,36 @@ function App() {
           const verifyData = await verifyResponse.json();
 
           if (verifyData.verified) {
-            setIsVerified(true);
-            setIsWaiting(false);
-            console.log('✅ Proof verified successfully!');
+            setVerified(true);
+            navigate('/casino');
           } else {
             throw new Error('Proof verification failed');
           }
         } else if (data.status === 'expired') {
           setError('Challenge expired. Please try again.');
-          setIsWaiting(false);
         } else if (attempts < maxAttempts) {
           attempts++;
           setTimeout(poll, 5000);
         } else {
           setError('Verification timeout. Please try again.');
-          setIsWaiting(false);
         }
       } catch (err: any) {
-        console.error('Polling error:', err);
         setError(`Polling failed: ${err.message}`);
-        setIsWaiting(false);
       }
     };
 
     poll();
   };
 
+  // Demo mode: Skip verification
+  const skipVerification = () => {
+    setVerified(true);
+    navigate('/casino');
+  };
+
   const reset = () => {
     setChallenge(null);
     setChallengeQR(null);
-    setIsVerified(false);
-    setIsWaiting(false);
     setError(null);
   };
 
@@ -204,21 +177,16 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
-      {/* Animated background gradients */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--accent)]/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[var(--accent)]/5 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute inset-0 bg-grid-white/[0.02]" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[var(--accent)]/5 rounded-full blur-3xl animate-pulse" />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-8">
-        {/* Header */}
         <header className="text-center mb-12" data-aos="fade-down">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Shield className="w-10 h-10 text-[var(--accent)]" />
-            <span className="text-3xl font-bold gradient">
-              {RESTRICTED_CONTENT.game.title}
-            </span>
+            <span className="text-3xl font-bold gradient">Solstice Casino</span>
           </div>
           <p className="text-[hsl(var(--muted-foreground))]">
             Age-restricted content • Powered by <span className="text-[var(--accent)]">Solstice Protocol</span>
@@ -226,8 +194,7 @@ function App() {
         </header>
 
         <div className="max-w-2xl mx-auto">
-          {/* Initial state - not verified, no QR */}
-          {!isVerified && !challengeQR && (
+          {!challengeQR ? (
             <Card variant="glass" data-aos="fade-up">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -235,7 +202,7 @@ function App() {
                   Age Verification Required (18+)
                 </CardTitle>
                 <CardDescription>
-                  You must verify your age using zero-knowledge proof to access this content
+                  You must verify your age using zero-knowledge proof to access the casino
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -254,7 +221,7 @@ function App() {
                     </li>
                     <li className="flex gap-3">
                       <span className="font-bold text-[var(--accent)] min-w-[24px]">2.</span>
-                      <span>You scan it with the Solstice app (where you registered your identity)</span>
+                      <span>You scan it with the Solstice app</span>
                     </li>
                     <li className="flex gap-3">
                       <span className="font-bold text-[var(--accent)] min-w-[24px]">3.</span>
@@ -271,12 +238,24 @@ function App() {
                   <QrCode className="w-5 h-5 mr-2" />
                   Generate Verification QR Code
                 </Button>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-[hsl(var(--border))]" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-[hsl(var(--background))] px-2 text-[hsl(var(--muted-foreground))]">
+                      Or for demo
+                    </span>
+                  </div>
+                </div>
+
+                <Button onClick={skipVerification} variant="outline" className="w-full">
+                  Skip Verification (Demo Mode)
+                </Button>
               </CardContent>
             </Card>
-          )}
-
-          {/* QR Code displayed, waiting for scan */}
-          {challengeQR && !isVerified && (
+          ) : (
             <Card variant="glass" data-aos="fade-up">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -284,7 +263,7 @@ function App() {
                   Scan This QR Code
                 </CardTitle>
                 <CardDescription>
-                  Open the main Solstice app and scan this challenge to verify your age
+                  Open the Solstice app and scan this challenge
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -302,9 +281,6 @@ function App() {
                       Challenge ID: <span className="font-mono">{challenge.challengeId.substring(0, 16)}...</span>
                     </p>
                   )}
-                  <p className="text-xs text-[hsl(var(--muted-foreground))]">
-                    This QR code expires in 5 minutes
-                  </p>
                 </div>
 
                 {error && (
@@ -313,104 +289,71 @@ function App() {
                   </div>
                 )}
 
-                <div className="bg-[var(--accent)]/10 border border-[var(--accent)]/30 rounded-lg p-4">
-                  <p className="text-sm text-[var(--accent)]">
-                    <strong>📱 Instructions:</strong> Open the Solstice app on your phone, go to the "Scan Challenge" tab, and scan this QR code with your camera.
-                  </p>
-                </div>
-
                 <Button onClick={reset} variant="outline" className="w-full">
                   Cancel
                 </Button>
               </CardContent>
             </Card>
           )}
-
-          {/* Verified state - show content */}
-          {isVerified && (
-            <>
-              <Card variant="accent" className="mb-6" data-aos="zoom-in">
-                <CardContent className="pt-6 text-center">
-                  <CheckCircle2 className="w-16 h-16 mx-auto mb-4 text-[var(--accent)]" />
-                  <h3 className="text-2xl font-bold text-[var(--accent)] mb-2">
-                    Age Verified! ✅
-                  </h3>
-                  <p className="text-[hsl(var(--muted-foreground))]">
-                    You have been verified as 18+ using zero-knowledge proof technology
-                  </p>
-                  <p className="text-sm text-[hsl(var(--muted-foreground))] mt-2">
-                    No personal data was shared in this process
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card variant="glass" data-aos="fade-up" data-aos-delay="200">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Trophy className="w-6 h-6 text-yellow-400" />
-                    {RESTRICTED_CONTENT.game.title}
-                  </CardTitle>
-                  <CardDescription>
-                    {RESTRICTED_CONTENT.game.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-6 text-center">
-                    <Trophy className="w-12 h-12 mx-auto mb-3 text-yellow-400" />
-                    <h4 className="text-xl font-bold mb-2">1000 SOL Prize Pool</h4>
-                    <p className="text-sm text-[hsl(var(--muted-foreground))]">
-                      Compete in high-stakes games and win big rewards!
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-[hsl(var(--muted))]/50 border border-[hsl(var(--border))] rounded-lg p-4 text-center">
-                      <p className="text-2xl font-bold text-[var(--accent)]">1,234</p>
-                      <p className="text-xs text-[hsl(var(--muted-foreground))]">Active Players</p>
-                    </div>
-                    <div className="bg-[hsl(var(--muted))]/50 border border-[hsl(var(--border))] rounded-lg p-4 text-center">
-                      <p className="text-2xl font-bold text-[var(--accent)]">24/7</p>
-                      <p className="text-xs text-[hsl(var(--muted-foreground))]">Live Games</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-[hsl(var(--muted))]/50 border border-[hsl(var(--border))] rounded-lg p-3 text-center hover:border-[var(--accent)]/50 transition-colors cursor-pointer">
-                      <p className="text-lg font-bold text-blue-400">🎰</p>
-                      <p className="text-xs text-[hsl(var(--muted-foreground))]">Slots</p>
-                    </div>
-                    <div className="bg-[hsl(var(--muted))]/50 border border-[hsl(var(--border))] rounded-lg p-3 text-center hover:border-[var(--accent)]/50 transition-colors cursor-pointer">
-                      <p className="text-lg font-bold text-red-400">🃏</p>
-                      <p className="text-xs text-[hsl(var(--muted-foreground))]">Poker</p>
-                    </div>
-                    <div className="bg-[hsl(var(--muted))]/50 border border-[hsl(var(--border))] rounded-lg p-3 text-center hover:border-[var(--accent)]/50 transition-colors cursor-pointer">
-                      <p className="text-lg font-bold text-green-400">🎲</p>
-                      <p className="text-xs text-[hsl(var(--muted-foreground))]">Dice</p>
-                    </div>
-                  </div>
-
-                  <Button className="w-full" size="lg">
-                    <Trophy className="w-5 h-5 mr-2" />
-                    Enter Game Lobby
-                  </Button>
-
-                  <Button onClick={reset} variant="outline" className="w-full">
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Logout & Reset
-                  </Button>
-                </CardContent>
-              </Card>
-            </>
-          )}
         </div>
-
-        {/* Footer */}
-        <footer className="mt-12 text-center text-sm text-[hsl(var(--muted-foreground))]" data-aos="fade-up">
-          <p>Powered by <span className="text-[var(--accent)]">Solstice Protocol</span> • Zero-Knowledge Identity Verification</p>
-          <p className="mt-1">Built on Solana Devnet • Challenge-Response Architecture</p>
-        </footer>
       </div>
     </div>
+  );
+}
+
+// Protected Route wrapper
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isVerified } = useGame();
+
+  if (!isVerified) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// Main App Routes
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<AgeVerification />} />
+      <Route path="/casino" element={
+        <ProtectedRoute><CasinoHome /></ProtectedRoute>
+      } />
+      <Route path="/casino/dice" element={
+        <ProtectedRoute><Dice /></ProtectedRoute>
+      } />
+      <Route path="/casino/coinflip" element={
+        <ProtectedRoute><CoinFlip /></ProtectedRoute>
+      } />
+      <Route path="/casino/mines" element={
+        <ProtectedRoute><Mines /></ProtectedRoute>
+      } />
+      <Route path="/casino/roulette" element={
+        <ProtectedRoute><Roulette /></ProtectedRoute>
+      } />
+    </Routes>
+  );
+}
+
+function App() {
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    AOS.init({
+      once: true,
+      duration: 600,
+      offset: 40,
+      mirror: false,
+      disable: prefersReducedMotion || window.innerWidth < 768,
+    });
+  }, []);
+
+  return (
+    <BrowserRouter>
+      <GameProvider>
+        <AppRoutes />
+      </GameProvider>
+    </BrowserRouter>
   );
 }
 
