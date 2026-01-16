@@ -1,0 +1,418 @@
+generate a [idea] landing page with this json style
+
+{
+
+"brand_identity": {
+"description": "Ultra-clean monochrome design with cinematic video backgrounds and refined minimalist typography",
+"design_philosophy": "Pure black and white aesthetic with video-first approach, maximum clarity through simplicity"
+},
+"color_system": {
+"background": {
+"primary": "#000000",
+"note": "CRITICAL: Background color MUST ALWAYS be #000000 (pure black) on ALL sections. This is the ONLY background color allowed. Never use gradients. Non-negotiable."
+},
+"text": {
+"primary": "#F5F5F7",
+"secondary": "rgba(255, 255, 255, 0.8)",
+"muted": "rgba(134, 134, 139, 1.0)",
+"note": "Only white and white with opacity variations. NO other colors allowed."
+},
+"accent": {
+"primary": "#FFFFFF",
+"secondary": "rgba(255, 255, 255, 0.9)",
+"note": "ONLY WHITE for accents. Pure monochrome - no colors."
+},
+"interactive": {
+"button_bg": "rgba(42, 42, 45, 0.72)",
+"button_hover": "rgba(66, 66, 69, 0.72)",
+"button_text": "#FFFFFF",
+"backdrop_blur": "blur(20px)",
+"note": "Glass morphism with white text only"
+},
+"color_rules": {
+"allowed": [
+"#000000 (black - backgrounds only)",
+"#FFFFFF (white - text and UI)",
+"rgba(255, 255, 255, X) - white with opacity",
+"rgba(0, 0, 0, X) - black with opacity for overlays",
+"rgba(134, 134, 139, 1.0) - muted gray for secondary text",
+"rgba(42, 42, 45, 0.72) - dark translucent for UI",
+"rgba(66, 66, 69, 0.72) - slightly lighter for hover states"
+],
+"forbidden": [
+"NO gradients anywhere",
+"NO colors other than black and white",
+"NO colored accents",
+"NO gray backgrounds (only black #000000)"
+]
+}
+},
+"typography": {
+"philosophy": "Large, impactful headlines with clear hierarchy and generous spacing",
+"never_use_gradients": "NEVER apply gradient effects to text. Use solid white only.",
+"color_rule": "ALL TEXT MUST BE WHITE (#F5F5F7/#FFFFFF) or white with opacity. NO other colors.",
+"scale": {
+"hero_display": {
+"size": "80px",
+"weight": "600",
+"line_height": "1.05",
+"color": "#F5F5F7",
+"usage": "Main hero headlines",
+"responsive": "Scales down to 48px on mobile"
+},
+"large_heading": {
+"size": "56px",
+"weight": "600",
+"line_height": "1.1",
+"color": "#F5F5F7",
+"usage": "Section headlines",
+"responsive": "48px on tablet, 32px on mobile"
+},
+"medium_heading": {
+"size": "48px",
+"weight": "600",
+"line_height": "1.2",
+"color": "#F5F5F7",
+"usage": "Subsection titles"
+},
+"small_heading": {
+"size": "28px",
+"weight": "600",
+"line_height": "1.15",
+"color": "#F5F5F7",
+"usage": "Card titles, feature labels"
+},
+"body_large": {
+"size": "22px",
+"weight": "600",
+"line_height": "1.4",
+"color": "rgba(255, 255, 255, 0.9)",
+"usage": "Primary body text, descriptions"
+},
+"body_standard": {
+"size": "18px",
+"weight": "400",
+"line_height": "1.5",
+"color": "rgba(255, 255, 255, 0.8)",
+"usage": "Standard paragraphs, accordion content"
+},
+"body_muted": {
+"size": "18px",
+"weight": "600",
+"line_height": "1.5",
+"color": "rgba(134, 134, 139, 1.0)",
+"usage": "Secondary information, captions"
+},
+"navigation": {
+"size": "12px",
+"weight": "600",
+"letter_spacing": "normal",
+"color": "rgba(255, 255, 255, 0.8)"
+}
+}
+},
+"spacing_rhythm": {
+"philosophy": "Generous whitespace with clear sectional divisions",
+"vertical_spacing": {
+"section_padding_extra_large": "216px",
+"section_padding_large": "160px",
+"section_padding_medium": "124px",
+"section_padding_small": "64px",
+"content_gap_large": "80px",
+"content_gap_medium": "48px",
+"content_gap_small": "20px",
+"element_margin_large": "80px",
+"element_margin_medium": "48px",
+"element_margin_small": "20px"
+},
+"container": {
+"max_width": "1024px",
+"content_width": "87.5%",
+"constrained_width": "420px",
+"wide_width": "1680px"
+}
+},
+"video_system": {
+"philosophy": "Videos replace ALL images throughout the site. Every visual element uses video backgrounds.",
+"video_urls": [
+"https://customer-cbeadsgr09pnsezs.cloudflarestream.com/90bb1b34646b81b3b63e5a854ea00da3/manifest/video.m3u8",
+"https://customer-cbeadsgr09pnsezs.cloudflarestream.com/df176a2fb2ea2b64bd21ae1c10d3af6a/manifest/video.m3u8",
+"https://customer-cbeadsgr09pnsezs.cloudflarestream.com/12a9780eeb1ea015801a5f55cf2e9d3d/manifest/video.m3u8",
+"https://customer-cbeadsgr09pnsezs.cloudflarestream.com/964cb3eddff1a67e3772aac9a7aceea2/manifest/video.m3u8",
+"https://customer-cbeadsgr09pnsezs.cloudflarestream.com/dd17599dfa77f41517133fa7a4967535/manifest/video.m3u8",
+"https://customer-cbeadsgr09pnsezs.cloudflarestream.com/408ad52e3f15bc8f01ae69d194a8cf3a/manifest/video.m3u8",
+"https://customer-cbeadsgr09pnsezs.cloudflarestream.com/e923e67d71fed3e0853ec57f0348451e/manifest/video.m3u8",
+"https://customer-cbeadsgr09pnsezs.cloudflarestream.com/136a8a211c6c3b1cc1fd7b1c7d836c58/manifest/video.m3u8",
+"https://customer-cbeadsgr09pnsezs.cloudflarestream.com/c9ddd33ac3d964e5d33b31ce849e8f95/manifest/video.m3u8",
+"https://customer-cbeadsgr09pnsezs.cloudflarestream.com/257c7359efd4b4aaebcc03aa8fc78a36/manifest/video.m3u8",
+"https://customer-cbeadsgr09pnsezs.cloudflarestream.com/697945ca6b876878dba3b23fbd2f1561/manifest/video.m3u8"
+],
+"usage_rules": [
+"NO static images anywhere on the site",
+"Hero section MUST use video background",
+"Feature sections use video backgrounds instead of images",
+"Product showcases use videos",
+"Card backgrounds use videos",
+"Gallery sections use multiple videos",
+"Randomly select different videos for each section/component",
+"Each visual element gets a random video from the pool"
+],
+"video_implementation": {
+"format": "HLS streams (.m3u8) for adaptive quality",
+"attributes": "autoplay loop muted playsinline",
+"object_fit": "cover or contain depending on context",
+"positioning": "absolute for backgrounds, relative for inline content",
+"z_index": "Background videos at z-index 1-3, text overlays at 10+",
+"performance": "Lazy load videos below fold, preload hero video"
+}
+},
+"layout_patterns": {
+"hero_section": {
+"structure": "Full-width video background with centered text overlay",
+"video_requirement": "MANDATORY - Randomly select one video from pool",
+"min_height": "min(1180px, calc(100vh - 0px))",
+"content_positioning": "Centered vertically and horizontally",
+"text_alignment": "Center-aligned",
+"padding": "64px top/bottom on desktop, scales down on mobile",
+"text_color": "#F5F5F7 (white)",
+"background": "#000000 with video overlay"
+},
+"navigation": {
+"style": "Fixed sticky top bar with blur background",
+"height": "44px",
+"background": "rgba(22, 22, 23, 1.0) with backdrop-filter blur",
+"behavior": "Position fixed, z-index 9999",
+"text_color": "rgba(255, 255, 255, 0.8)",
+"logo": "Apple logo SVG, 14px width",
+"menu_items": "12px font, 600 weight, evenly spaced",
+"max_width": "1024px centered"
+},
+"content_sections": {
+"structure": "Centered content with max-width constraints",
+"width": "87.5% of viewport",
+"max_width": "420px for text, 1680px for full-width",
+"alignment": "Center-aligned containers",
+"video_usage": "Videos replace all image placeholders",
+"text_video_split": "Flexible layouts - sometimes text over video, sometimes side-by-side"
+},
+"feature_cards": {
+"background": "Video backgrounds with dark overlays for readability",
+"video_selection": "Random from pool for each card",
+"text_overlay": "White text with rgba(0,0,0,0.4-0.6) overlay if needed",
+"border_radius": "28px",
+"padding": "32-48px",
+"min_height": "Varies - 213px-656px depending on card type"
+},
+"accordion_faq": {
+"style": "Collapsible sections with chevron icons",
+"border": "2px solid rgb(66, 66, 69) between items",
+"button_height": "auto with 1em padding top/bottom",
+"text_color": "#F5F5F7 for questions, rgba(255,255,255,0.8) for answers",
+"icon_color": "rgb(110, 110, 115) for chevrons",
+"font_size": "24px for questions, 18px for answers"
+}
+},
+"component_styles": {
+"buttons": {
+"primary": {
+"background": "rgba(42, 42, 45, 0.72)",
+"backdrop_filter": "blur(7px)",
+"border_radius": "28px",
+"min_height": "56px",
+"padding": "0 32px",
+"font_weight": "600",
+"color": "#FFFFFF",
+"hover": "background: rgba(66, 66, 69, 0.72)"
+},
+"icon_circular": {
+"size": "36px",
+"border_radius": "50%",
+"background": "rgba(66, 66, 69, 0.72)",
+"icon_color": "rgba(255, 255, 255, 0.8)",
+"hover": "opacity change, cursor pointer"
+},
+"accordion_toggle": {
+"background": "transparent",
+"padding": "1em top/bottom",
+"text_align": "left with space-between justify",
+"icon": "Chevron SVG in rgb(110, 110, 115)",
+"hover": "subtle opacity change"
+}
+},
+"cards": {
+"background": "VIDEO background (not static image or color)",
+"video_source": "Randomly selected from video pool",
+"border_radius": "28px",
+"padding": "24px-72px depending on card size",
+"text_overlay_bg": "rgba(0, 0, 0, 0.3-0.5) if needed for contrast",
+"text_color": "#FFFFFF",
+"min_height": "213px small, 300px medium, 656px large",
+"aspect_ratio": "Varies by context"
+},
+"video_containers": {
+"border_radius": "None for full-screen, 28px for contained videos",
+"aspect_ratio": "Flexible based on content",
+"loading": "Black placeholder or poster frame",
+"quality": "Adaptive HLS streaming",
+"note": "Videos replace ALL image placeholders"
+},
+"carousel_navigation": {
+"button_style": "Circular with SVG arrows",
+"size": "36px",
+"background": "rgba(66, 66, 69, 0.72)",
+"disabled_opacity": "0.36",
+"active_state": "Full opacity with cursor pointer",
+"positioning": "Absolute at bottom, centered horizontally",
+"gap": "18px between buttons"
+}
+},
+"interaction_patterns": {
+"scrolling": {
+"horizontal_carousels": "Snap scroll with navigation arrows, overflow-x scroll",
+"sticky_elements": "Navigation bar (z-index 9999), section headers",
+"parallax": "Minimal - focus on content clarity",
+"overflow": "Hidden on containers, scroll on carousels"
+},
+"hover_states": {
+"links": "Opacity to 0.6-0.8, underline on interaction",
+"buttons": "Background color change, cursor pointer",
+"cards": "Subtle opacity or brightness change on video",
+"navigation": "No underline, opacity change only"
+},
+"accordions": {
+"animation": "Smooth expand/collapse with overflow hidden",
+"icon_rotation": "Chevron rotates on expand",
+"content_reveal": "Padding and opacity fade in",
+"max_width": "83.33% for content"
+},
+"mobile_responsive": {
+"breakpoints": {
+"small": "< 734px",
+"medium": "734px - 1068px",
+"large": "1069px - 1440px",
+"extra_large": "> 1441px"
+},
+"adaptations": [
+"Stack layouts vertically below 734px",
+"Reduce heading sizes progressively",
+"Increase touch targets to 44px minimum",
+"Full-width carousels on mobile",
+"Videos remain responsive with 100% width",
+"Padding scales down: 64px \u2192 48px \u2192 32px"
+]
+}
+},
+"visual_hierarchy": {
+"information_density": "Low to medium - generous breathing room",
+"focal_points": [
+"Large white typography on black backgrounds",
+"Dynamic video content as primary visual",
+"High contrast monochrome palette",
+"Strategic use of translucent UI elements"
+],
+"reading_flow": "Center-aligned for hero, flexible for sections",
+"whitespace_strategy": "Generous section padding (160-216px), clear visual separation",
+"contrast": "Maximum - pure black (#000000) and white (#FFFFFF)"
+},
+"content_strategy": {
+"no_static_images": "NEVER use static images anywhere - only videos",
+"video_distribution": "Randomly assign videos from pool to all visual elements",
+"video_variety": "Use different videos across sections when possible",
+"hero_video": "Always present, autoplay, full-screen",
+"section_videos": "Replace product images, feature backgrounds, card backgrounds",
+"fallback": "Black background (#000000) with white text if video fails",
+"performance": "Lazy load below-fold videos, optimize with HLS adaptive streaming"
+},
+"animation_motion": {
+"philosophy": "Minimal, purposeful animations for clarity",
+"transitions": {
+"duration": "300-400ms",
+"easing": "ease-out, cubic-bezier",
+"properties": "opacity, transform, backdrop-filter"
+},
+"scroll_animations": "Minimal - focus on immediate content visibility",
+"micro_interactions": [
+"Button hover state changes",
+"Accordion expand/collapse",
+"Carousel navigation",
+"Video play controls"
+],
+"video_autoplay": "Respect prefers-reduced-motion for accessibility"
+},
+"accessibility_notes": {
+"contrast": "Maximum contrast - WCAG AAA compliant (black/white)",
+"focus_states": "Visible white outline, -6px offset",
+"touch_targets": "Minimum 44x44px on mobile, 36px on desktop",
+"video_accessibility": [
+"Muted by default",
+"Provide play/pause controls when needed",
+"Respect prefers-reduced-motion",
+"Ensure content readable without video"
+],
+"semantic_html": "Proper heading hierarchy (h1\u2192h2\u2192h3), nav landmarks, button vs link",
+"aria_labels": "Screen reader friendly labels for icon buttons and SVGs"
+},
+"implementation_guidelines": {
+"critical_rules": [
+"NEVER use gradients anywhere - solid colors only",
+"Background MUST ALWAYS be #000000 (pure black) on all sections",
+"ONLY use black (#000000) and white (#FFFFFF) colors",
+"NO colored accents, NO grays as backgrounds",
+"ALL images must be replaced with videos from the provided pool",
+"Hero section MUST include video background",
+"Randomly select videos for EVERY visual element",
+"Text must be white (#F5F5F7/#FFFFFF) or white with opacity",
+"Use large, impactful typography (80px hero, 56px sections)",
+"Generous spacing: 160-216px section padding",
+"Glass morphism: backdrop-filter blur(20px) on UI elements",
+"Border radius: 28px for buttons/cards, 50% for circular buttons",
+"Responsive breakpoints: 734px, 1068px, 1441px",
+"Navigation: Fixed at top, 44px height, dark translucent background"
+],
+"video_everywhere_implementation": {
+"hero": "Full-screen video background, randomly selected from pool",
+"features": "Video backgrounds for feature sections",
+"cards": "Video backgrounds for each card, different videos per card",
+"products": "Videos instead of product photos",
+"galleries": "Grid/carousel of videos, not images",
+"backgrounds": "Decorative sections use videos",
+"random_selection": "Each visual element randomly picks from 11 URLs",
+"video_element": "<video autoplay loop muted playsinline style='width:100%;height:100%;object-fit:cover;'><source src='[RANDOM_URL]' type='application/x-mpegURL'></video>"
+},
+"layout_specifics": {
+"hero_layout": "Centered content, min-height: min(1180px, 100vh)",
+"section_width": "87.5% viewport, max 420px for text",
+"text_alignment": "Center for hero, flexible for sections",
+"carousel_structure": "Horizontal scroll with snap, navigation dots/arrows",
+"accordion_structure": "Border between items, chevron icons, expandable content",
+"footer": "Simple links list, minimal styling"
+},
+"color_restrictions": {
+"allowed": [
+"#000000 (black backgrounds)",
+"#FFFFFF (white text/UI)",
+"rgba(255, 255, 255, X) - white opacity variations",
+"rgba(0, 0, 0, X) - black opacity for overlays",
+"rgba(134, 134, 139, 1.0) - muted gray for secondary text only",
+"rgba(42, 42, 45, 0.72) - dark translucent UI",
+"rgba(66, 66, 69, 0.72) - hover states",
+"rgb(22, 22, 23) - navigation background"
+],
+"forbidden": [
+"ANY color other than black and white variations",
+"Gradients of any kind",
+"Colored text or backgrounds",
+"Colorful imagery (use videos only)"
+]
+},
+"forbidden": [
+"Gradient effects anywhere",
+"Backgrounds other than #000000",
+"Any accent colors or colored elements",
+"Static images (use videos instead)",
+"Small typography (minimum 18px body)",
+"Cramped layouts without whitespace",
+"Complex color schemes"
+]
+}
+}

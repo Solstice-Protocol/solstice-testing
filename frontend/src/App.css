@@ -1,523 +1,214 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@theme {
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
 
-/* Premium Casino Theme - Inspired by Stake.com */
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
 
-:root {
-  /* Core colors */
-  --bg-darkest: #0d0d14;
-  --bg-primary: #0f1419;
-  --bg-secondary: #1a1f26;
-  --bg-card: #1e242d;
-  --bg-elevated: #252d38;
-  --bg-hover: #2d3744;
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
 
-  /* Accents */
-  --accent: #1fff20;
-  --accent-hover: #00dd33;
-  --accent-muted: rgba(31, 255, 32, 0.1);
-  --accent-glow: rgba(31, 255, 32, 0.3);
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
 
-  /* Text */
-  --text-primary: #ffffff;
-  --text-secondary: #b1b6c0;
-  --text-muted: #6b7280;
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
 
-  /* Borders */
-  --border: #2d3544;
-  --border-hover: #3d4554;
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
 
-  /* Status */
-  --success: #22c55e;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --info: #3b82f6;
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 30px var(--accent-glow);
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
 
-  /* Layout */
-  --sidebar-width: 240px;
-  --sidebar-collapsed: 72px;
-  --header-height: 64px;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --radius-lg: 16px;
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+
+    to {
+      height: 0;
+    }
+  }
 }
 
-/* Reset & Base */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@utility container {
+  margin-inline: auto;
+  padding-inline: 2rem;
+
+  @media (width >=--theme(--breakpoint-sm)) {
+    max-width: none;
+  }
+
+  @media (width >=1400px) {
+    max-width: 1400px;
+  }
 }
 
-html {
-  font-size: 16px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background: var(--bg-darkest);
-  color: var(--text-primary);
-  line-height: 1.5;
-  min-height: 100vh;
+@layer utilities {
+  :root {
+    /* Strict Monochrome Palette */
+    --background: 0 0% 0%;
+    /* #000000 */
+    --foreground: 0 0% 100%;
+    /* #FFFFFF */
+
+    --card: 0 0% 0%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 0 0% 0%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 240 5% 26%;
+    /* rgba(66, 66, 69, 1) approx for opaque fallback */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 240 5% 26%;
+    --muted-foreground: 240 2% 54%;
+    /* rgba(134, 134, 139, 1.0) */
+
+    --accent: 0 0% 100%;
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5% 26%;
+    --input: 240 5% 26%;
+    --ring: 0 0% 100%;
+
+    --radius: 1.75rem;
+    /* 28px */
+
+    /* Custom Variables from JSON */
+    --text-primary: #F5F5F7;
+    --text-secondary: rgba(255, 255, 255, 0.8);
+    --text-muted: rgba(134, 134, 139, 1.0);
+
+    --bg-glass: rgba(42, 42, 45, 0.72);
+    --bg-glass-hover: rgba(66, 66, 69, 0.72);
+  }
+
+  .dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+
+    --card: 0 0% 0%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 0 0% 0%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 240 5% 26%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 240 5% 26%;
+    --muted-foreground: 240 2% 54%;
+
+    --accent: 0 0% 100%;
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5% 26%;
+    --input: 240 5% 26%;
+    --ring: 0 0% 100%;
+  }
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    background-color: #000000 !important;
+    /* Force black background */
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--bg-elevated);
-  border-radius: 4px;
+.glass-button {
+  background: var(--bg-glass);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  color: #FFFFFF;
+  transition: all 0.3s ease;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--border);
+.glass-button:hover {
+  background: var(--bg-glass-hover);
 }
 
-/* Selection */
-::selection {
-  background: var(--accent);
-  color: black;
-}
-
-/* ============================================
-   LAYOUT COMPONENTS
-   ============================================ */
-
-/* Sidebar */
-.sidebar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  height: 100vh;
-  background: var(--bg-secondary);
-  border-right: 1px solid var(--border);
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  transition: width 0.3s ease;
-}
-
-.sidebar-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.15s ease;
-  cursor: pointer;
-}
-
-.sidebar-item:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-}
-
-.sidebar-item.active {
-  background: var(--accent-muted);
-  color: var(--accent);
-}
-
-.sidebar-item.active .sidebar-icon {
-  color: var(--accent);
-}
-
-/* Header */
-.header {
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: var(--header-height);
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border);
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  transition: left 0.3s ease;
-}
-
-/* ============================================
-   GAME COMPONENTS
-   ============================================ */
-
-.game-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  transition: all 0.2s ease;
-}
-
-.game-card:hover {
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow-md);
-}
-
-.game-area {
-  background: var(--bg-primary);
-  border-radius: var(--radius);
-  padding: 24px;
-}
-
-/* Bet Controls */
-.bet-input {
-  width: 100%;
-  background: var(--bg-primary);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  color: var(--text-primary);
-  font-size: 18px;
+/* Typography Utilities */
+.text-hero {
+  font-size: 80px;
+  line-height: 1.05;
   font-weight: 600;
-  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-  text-align: right;
-  transition: border-color 0.2s ease;
+  letter-spacing: -0.02em;
 }
-
-.bet-input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.bet-input::placeholder {
-  color: var(--text-muted);
-}
-
-.bet-button {
-  width: 100%;
-  background: linear-gradient(135deg, var(--accent) 0%, #00dd33 100%);
-  border: none;
-  border-radius: var(--radius);
-  padding: 16px 24px;
-  color: black;
-  font-size: 16px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 15px var(--accent-glow);
-}
-
-.bet-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px var(--accent-glow);
-}
-
-.bet-button:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.bet-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.quick-btn {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.quick-btn:hover {
-  background: var(--bg-hover);
-  border-color: var(--border-hover);
-  color: var(--text-primary);
-}
-
-/* Game Input (used in sliders etc) */
-.game-input {
-  background: var(--bg-primary);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px 16px;
-  color: var(--text-primary);
-  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-  font-size: 16px;
-  transition: border-color 0.2s ease;
-}
-
-.game-input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-/* Stats Display */
-.stat-box {
-  background: var(--bg-primary);
-  border-radius: var(--radius-sm);
-  padding: 16px;
-  text-align: center;
-}
-
-.stat-label {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-}
-
-.stat-value {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.stat-value.accent {
-  color: var(--accent);
-}
-
-.stat-value.success {
-  color: var(--success);
-}
-
-.stat-value.danger {
-  color: var(--danger);
-}
-
-/* ============================================
-   UTILITY CLASSES
-   ============================================ */
-
-.gradient-text {
-  background: linear-gradient(135deg, var(--accent) 0%, #00ffaa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.glow {
-  box-shadow: var(--shadow-glow);
-}
-
-.card-hover {
-  transition: all 0.2s ease;
-}
-
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-}
-
-/* Animations */
-@keyframes pulse-glow {
-
-  0%,
-  100% {
-    box-shadow: 0 0 20px var(--accent-glow);
-  }
-
-  50% {
-    box-shadow: 0 0 40px var(--accent-glow);
-  }
-}
-
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.animate-slide-up {
-  animation: slide-up 0.3s ease-out;
-}
-
-.animate-fade-in {
-  animation: fade-in 0.2s ease-out;
-}
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
 
 @media (max-width: 768px) {
-  :root {
-    --sidebar-width: 72px;
+  .text-hero {
+    font-size: 48px;
   }
-
-  .header {
-    left: var(--sidebar-collapsed) !important;
-    padding: 0 16px;
-  }
-}
-
-/* ============================================
-   PAGE-SPECIFIC
-   ============================================ */
-
-/* Age Verification */
-.age-verify-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 40px;
-  max-width: 420px;
-  width: 100%;
-}
-
-/* Casino Home */
-.home-hero {
-  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 32px;
-  margin-bottom: 32px;
-}
-
-.game-grid-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.game-grid-card:hover {
-  border-color: var(--accent);
-  background: var(--bg-elevated);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-/* Live Feed */
-.live-feed-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  background: var(--bg-primary);
-  border-radius: var(--radius-sm);
-  margin-bottom: 8px;
-  animation: slide-up 0.3s ease-out;
-}
-
-.live-feed-item.win {
-  border-left: 3px solid var(--success);
-}
-
-.live-feed-item.loss {
-  border-left: 3px solid var(--danger);
-}
-
-/* Profile Page */
-.profile-header {
-  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 32px;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.profile-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent) 0%, #00dd33 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  font-weight: 700;
-  color: black;
-}
-
-.profile-level {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--accent-muted);
-  color: var(--accent);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-/* Slots */
-.slot-reel {
-  background: var(--bg-primary);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-}
-
-.slot-symbol {
-  width: 80px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
-}
-
-.slot-symbol.winning {
-  background: var(--accent-muted);
-  animation: pulse-glow 0.5s ease-in-out infinite;
 }

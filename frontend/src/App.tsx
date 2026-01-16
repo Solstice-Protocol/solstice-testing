@@ -7,6 +7,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { GameProvider, useGame } from '@/context/GameContext';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { CasinoHome } from '@/pages/CasinoHome';
+import { CasinoLanding } from '@/pages/CasinoLanding';
 import { Dice } from '@/pages/games/Dice';
 import { CoinFlip } from '@/pages/games/CoinFlip';
 import { Mines } from '@/pages/games/Mines';
@@ -296,8 +297,20 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<AgeVerification />} />
+
+      {/* New Landing Page - Outside CasinoLayout to avoid sidebar */}
+      <Route
+        path="/casino"
+        element={
+          <ProtectedRoute>
+            <CasinoLanding />
+          </ProtectedRoute>
+        }
+      />
+
       <Route element={<CasinoLayout />}>
-        <Route path="/casino" element={<CasinoHome />} />
+        {/* Old Home replaced by Landing, keeping other routes */}
+        {/* <Route path="/casino" element={<CasinoHome />} /> */}
         <Route path="/casino/dice" element={<Dice />} />
         <Route path="/casino/coinflip" element={<CoinFlip />} />
         <Route path="/casino/mines" element={<Mines />} />
