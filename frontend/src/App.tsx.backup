@@ -47,7 +47,7 @@ function App() {
         
         await solsticeSDK.initialize();
         setSdk(solsticeSDK);
-        console.log('✅ Solstice SDK initialized');
+        console.log(' Solstice SDK initialized');
       } catch (err: any) {
         setError(`Failed to initialize SDK: ${err.message}`);
         console.error('SDK initialization error:', err);
@@ -166,7 +166,7 @@ function App() {
           status: 'Verified',
           commitment: Array.isArray(ageProof.publicSignals) ? ageProof.publicSignals[0] : 'N/A'
         });
-        console.log('✅ Identity verified successfully!');
+        console.log(' Identity verified successfully!');
       } else {
         throw new Error('Verification failed: User does not meet age requirement');
       }

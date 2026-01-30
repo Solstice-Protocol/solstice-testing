@@ -4,7 +4,7 @@ A fully functional identity verification app built with Solstice SDK and Protoco
 
 ## Features
 
-- ✅ **Zero-Knowledge Age Verification**: Prove you're 18+ without revealing your date of birth
+-  **Zero-Knowledge Age Verification**: Prove you're 18+ without revealing your date of birth
 - 📸 **QR Code Scanning**: Scan Aadhaar QR codes directly from your camera
 - 📤 **Image Upload**: Upload QR code images for verification
 ## Features
@@ -26,13 +26,13 @@ This is a **third-party consumer app** that:
 ## Features
 
 - 🎮 **Age-Gated Content**: Access restricted to verified adults (18+)
-- 🔒 **Privacy-Preserving**: Uses challenge-response with zero-knowledge proofs
+-  **Privacy-Preserving**: Uses challenge-response with zero-knowledge proofs
 - 📱 **QR Challenge Generation**: Creates challenges that users scan in the main Solstice app
 - 🧪 **Demo Mode**: Skip verification for testing the UI
 - ⚡ **Solana Integration**: Proofs verified on Solana devnet
 - 🎨 **Beautiful UI**: Modern, responsive design with Solana-themed gradients
-- 🔒 **Privacy-First**: All personal data stays on your device
-- 🚀 **Built on Solana**: Fast and cost-efficient blockchain verification
+-  **Privacy-First**: All personal data stays on your device
+-  **Built on Solana**: Fast and cost-efficient blockchain verification
 - 🎨 **Beautiful UI**: Built with Tailwind CSS and shadcn/ui
 
 ## How It Works
@@ -163,11 +163,11 @@ src/
 
 ## Security & Privacy
 
-- ✅ **Zero-Knowledge Proofs**: Only proves age ≥ 18, doesn't reveal exact age or other data
-- ✅ **Client-Side Proof Generation**: Personal data never leaves your browser
-- ✅ **Cryptographic Commitments**: Only hash commitments are stored on-chain
-- ✅ **Groth16 SNARKs**: 128-bit security with BN254 elliptic curves
-- ✅ **256-byte Proofs**: Constant-size proofs for efficient verification
+-  **Zero-Knowledge Proofs**: Only proves age ≥ 18, doesn't reveal exact age or other data
+-  **Client-Side Proof Generation**: Personal data never leaves your browser
+-  **Cryptographic Commitments**: Only hash commitments are stored on-chain
+-  **Groth16 SNARKs**: 128-bit security with BN254 elliptic curves
+-  **256-byte Proofs**: Constant-size proofs for efficient verification
 
 ## API Reference
 

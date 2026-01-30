@@ -189,7 +189,7 @@ export function CasinoHome() {
                     </h3>
                     <div className="space-y-3">
                         <Link to="/promotions" className="block p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl hover:from-purple-500/30 hover:to-pink-500/30 transition-colors">
-                            <div className="font-bold mb-1">🎉 Daily Bonus</div>
+                            <div className="font-bold mb-1"> Daily Bonus</div>
                             <div className="text-sm text-[var(--text-muted)]">Claim $100 free credits every day!</div>
                         </Link>
                         <Link to="/vip" className="block p-4 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-xl hover:from-amber-500/30 hover:to-orange-500/30 transition-colors">
